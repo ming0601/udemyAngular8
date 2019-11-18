@@ -1,17 +1,41 @@
+import { EventEmitter, Injectable } from '@angular/core';
+import { ShoppingListService } from './../shopping-list/shopping-list.service';
 import { Recipe } from './recipe.model';
-import { EventEmitter } from '@angular/core';
+import { Ingredient } from '../shared/ingredient.model';
 
+@Injectable()
 export class RecipeService {
     recipeSelected = new EventEmitter<Recipe>();
 
+    ingredientToShoppingListClicked = new EventEmitter<Ingredient[]>();
+
     recipes: Recipe[] = [
-        new Recipe('A Test Recipe 1', 'This is a simply test 1',
-        'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg'),
-        new Recipe('A Test Recipe 2', 'This is a simply test 2',
-        'https://cdn.pixabay.com/photo/2017/07/16/10/43/recipe-2508859_960_720.jpg')
-      ];
+        new Recipe(
+            'Pork Ribs BBQ',
+            'Tasty Pork Ribs BBQ and Fresh tomato salad',
+            'https://cdn.pixabay.com/photo/2016/06/15/19/09/food-1459693_960_720.jpg',
+            [
+                new Ingredient('Pork Ribs', 1),
+                new Ingredient('Cherry Tomatoes', 5)
+            ]),
+        new Recipe(
+            'Thai Beef Steak',
+            'Delicious spicy Thai Beef Steak',
+            'https://cdn.pixabay.com/photo/2017/07/16/10/43/recipe-2508859_960_720.jpg',
+            [
+                new Ingredient('Beef Steak', 4),
+                new Ingredient('Fresh chilli pepper', 2),
+                new Ingredient('Fresh green chilli', 1)
+            ])
+    ];
+
+    constructor(private shoppingListService: ShoppingListService) {}
 
     getRecipes(): Recipe[] {
         return this.recipes.slice();
+    }
+
+    addIngredientsToShoppingList(ingredients: Ingredient[]) {
+        this.shoppingListService.addIngredients(ingredients);
     }
 }
