@@ -1,4 +1,4 @@
-import { element } from 'protractor';
+import { ShoppingListService } from './../shopping-list.service';
 import { Ingredient } from './../../shared/ingredient.model';
 import { Component, OnInit, ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
 
@@ -10,15 +10,14 @@ import { Component, OnInit, ViewChild, Output, EventEmitter, ElementRef } from '
 export class ShoppingEditComponent implements OnInit {
   @ViewChild('nameInput', {static: false}) ingredientName: ElementRef;
   @ViewChild('amountInput', {static: false}) ingredientAmount: ElementRef;
-  @Output() newAddedIngredient = new EventEmitter<Ingredient>();
 
-  constructor() { }
+  constructor(private shoppingListService: ShoppingListService) { }
 
   ngOnInit() {
   }
 
   onSubmit() {
-    this.newAddedIngredient.emit(
+    this.shoppingListService.addNewIngredient(
       new Ingredient(this.ingredientName.nativeElement.value,
                     this.ingredientAmount.nativeElement.value));
   }
