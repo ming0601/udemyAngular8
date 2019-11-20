@@ -6,14 +6,9 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent implements OnInit {
-  @Output() loadingFeature = new EventEmitter<string>();
 
   constructor() { }
 
   ngOnInit() {
-  }
-
-  loadFeature(feature: string) {
-    this.loadingFeature.emit(feature);
   }
 }
