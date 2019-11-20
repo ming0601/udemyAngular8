@@ -17,6 +17,9 @@ export class RecipeDetailComponent implements OnInit {
               private router: Router) { }
 
   ngOnInit() {
+    // These observable is handled by Angular, this cannot be destroy, Angular will manage
+    // In case of Custom Observable, it must be destroyed when the component is destroyed
+    // OnDestroy must be implemented and unsubscribe the Observable
     const id = this.route.params.subscribe(
       (params: Params) => {
         this.id = +params.id;
