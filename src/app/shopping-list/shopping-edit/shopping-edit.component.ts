@@ -1,24 +1,43 @@
+import { Subscription } from 'rxjs';
 import { ShoppingListService } from './../shopping-list.service';
 import { Ingredient } from './../../shared/ingredient.model';
-import { Component, OnInit, ViewChild, Output, EventEmitter, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-shopping-edit',
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css']
 })
-export class ShoppingEditComponent implements OnInit {
-  @ViewChild('nameInput', {static: false}) ingredientName: ElementRef;
-  @ViewChild('amountInput', {static: false}) ingredientAmount: ElementRef;
+export class ShoppingEditComponent implements OnInit, OnDestroy {
+  @ViewChild('fm', {static: false}) shoppingListForm: NgForm;
+  subscription: Subscription;
+  isEditMode = false;
+  itemIndexNumber: number;
+  editedItem: Ingredient;
 
   constructor(private shoppingListService: ShoppingListService) { }
 
   ngOnInit() {
+    this.subscription = this.shoppingListService.startedEditing.subscribe(
+      (index: number) => {
+        this.itemIndexNumber = index;
+        this.isEditMode = true;
+        this.editedItem = this.shoppingListService.getIngredient(index);
+        this.shoppingListForm.setValue({
+          name: this.editedItem.name,
+          amount: this.editedItem.amount
+        });
+      }
+    );
   }
 
-  onSubmit() {
+  onSubmit(form: NgForm) {
     this.shoppingListService.addNewIngredient(
-      new Ingredient(this.ingredientName.nativeElement.value,
-                    this.ingredientAmount.nativeElement.value));
+      new Ingredient(form.value.name, form.value.amount));
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 }
