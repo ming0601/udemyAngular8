@@ -1,1 +1,61 @@
-<p>recipe-edit works!</p>
+<div class="row">
+    <div class="col-12">
+        <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+            <div class="row">
+                <div class="col-12">
+                    <button type="submit" class="btn btn-success" [disabled]="!recipeForm.valid">Save</button>
+                    <button type="button" class="btn btn-danger" (click)="cancelEditRecipe()">Cancel</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="form-control" formControlName="name">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="imagePath">Image URL</label>
+                        <input type="text" id="imagePath" class="form-control" formControlName="imagePath" #imagePath>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <img [src]="imagePath.value" class="img-fluid">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea type="text" id="description" class="form-control" formControlName="description"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12" formArrayName="ingredients">
+                    <div class="row" *ngFor="let control of getIngredientsControls(); let i = index"
+                        [formGroupName]="i" style="margin-top: 5px;">
+                        <div class="col-7">
+                            <input type="text" class="form-control" formControlName="name">
+                        </div>
+                        <div class="col-3">
+                            <input type="number" class="form-control" formControlName="amount">
+                        </div>
+                        <div class="col-2">
+                            <button class="btn btn-danger">X</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="col-12">
+                        <button type="button" class="btn btn-success"(click)="addIngredient()">Add Ingredient</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
