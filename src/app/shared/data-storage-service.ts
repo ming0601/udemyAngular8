@@ -25,9 +25,7 @@ export class DataStorageService {
         this.http
         .get<Recipe[]>(FIREBASE_URL + RECIPE_DB)
         .subscribe(recipes => {
-            recipes.forEach(recipe => {
-                this.recipeService.addRecipe(recipe);
-            });
+            this.recipeService.setRecipes(recipes);
         });
     }
 }
