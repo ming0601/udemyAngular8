@@ -22,12 +22,24 @@ export class AuthService {
 
     constructor(private http: HttpClient) {}
 
-    signup(email: string, password: string): Observable<AuthPayloadResponse> {
+    signup(email: string, password: string): Observable<any> {
         return this.http
         .post<AuthPayloadResponse>(
             AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
             { email: email, password: password, returnSecureToken: true })
-        .pipe(catchError(errorResponse => {
+        .pipe(this.handleError());
+    }
+
+    signIn(email: string, password: string): Observable<any> {
+        return this.http
+        .post<AuthPayloadResponse>(
+            AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
+            { email: email, password: password, returnSecureToken: true })
+        .pipe(this.handleError());
+    }
+
+    private handleError() {
+        return catchError(errorResponse => {
             let errorMessage = 'An unknown error occurred!';
             if (!errorResponse.error || !errorResponse.error.error) {
                 return throwError(errorMessage);
@@ -40,27 +52,20 @@ export class AuthService {
                     errorMessage = 'Password sign-in is disabled.';
                     break;
                 case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-                    errorMessage = 'Too many requests. Try again later.';
+                    errorMessage = 'Too many requests. Please try again later.';
                     break;
+                case 'EMAIL_NOT_FOUND':
+                        errorMessage = 'Invalid email or password.';
+                        break;
+                case 'INVALID_PASSWORD':
+                        errorMessage = 'Invalid email or password.';
+                        break;
+                case 'USER_DISABLED':
+                        errorMessage = 'Invalid email or password.';
+                        break;
                 default: break;
             }
             return throwError(errorMessage);
-            }));
-    }
-
-    signIn(email: string, password: string): Observable<AuthPayloadResponse> {
-        return this.http
-        .post<AuthPayloadResponse>(
-            AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
-            { email: email, password: password, returnSecureToken: true })
-        .pipe(catchError(errorResponse => {
-            let errorMessage = 'An unknown error occurred!';
-            if (!errorResponse.error || !errorResponse.error.error) {
-                return throwError(errorMessage);
-            } else {
-                errorMessage = 'Invalid email or password.';
-            }
-            return throwError(errorMessage);
-            }));
+        });
     }
 }
