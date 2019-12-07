@@ -1,7 +1,7 @@
 import { User } from './../shared/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError, Subject } from 'rxjs';
+import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 
 export interface AuthPayloadResponse {
@@ -20,32 +20,32 @@ const FIREBASE_API_KEY = 'AI';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
-    user = new Subject<User>();
+    user = new BehaviorSubject<User>(null);
 
     constructor(private http: HttpClient) {}
 
     signup(email: string, password: string): Observable<any> {
         return this.http
-        .post<AuthPayloadResponse>(
-            AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
-            { email: email, password: password, returnSecureToken: true })
-        .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
-        );
+            .post<AuthPayloadResponse>(
+                AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
+                { email: email, password: password, returnSecureToken: true })
+            .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+            );
     }
 
     signIn(email: string, password: string): Observable<any> {
         return this.http
-        .post<AuthPayloadResponse>(
-            AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
-            { email: email, password: password, returnSecureToken: true })
-        .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
-        );
+            .post<AuthPayloadResponse>(
+                AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
+                { email: email, password: password, returnSecureToken: true })
+            .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+            );
     }
 
     private handleUserAuth(authResp: AuthPayloadResponse) {
-            const expirationDate = new Date(new Date().getTime() + (+authResp.expiresIn * 1000));
-            const user = new User(authResp.email, authResp.localId, authResp.idToken, expirationDate);
-            this.user.next(user);
+        const expirationDate = new Date(new Date().getTime() + (+authResp.expiresIn * 1000));
+        const user = new User(authResp.email, authResp.localId, authResp.idToken, expirationDate);
+        this.user.next(user);
     }
 
     private handleError() {
