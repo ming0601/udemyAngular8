@@ -5,6 +5,7 @@ import { RecipeService } from './../recipes/recipe.service';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, tap, take, exhaustMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 
 const FIREBASE_URL = 'https://udemy-ng8-recipe-book.firebaseio.com/';
@@ -25,8 +26,8 @@ export class DataStorageService {
             .subscribe(response => { console.log(response); });
     }
 
-    fetchRecipes() {
-        this.authService.user
+    fetchRecipes(): Observable<Recipe[]> {
+       return this.authService.user
         .pipe(
             take(1), // `take` returns an Observable that emits only the first `count` values emitted
                     // by the source Observable. If the source emits fewer than `count` values then

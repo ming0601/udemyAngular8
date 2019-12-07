@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { User } from './../shared/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
@@ -22,7 +23,7 @@ const FIREBASE_API_KEY = 'AI';
 export class AuthService {
     user = new BehaviorSubject<User>(null);
 
-    constructor(private http: HttpClient) {}
+    constructor(private http: HttpClient, private router: Router) {}
 
     signup(email: string, password: string): Observable<any> {
         return this.http
@@ -40,6 +41,11 @@ export class AuthService {
                 { email: email, password: password, returnSecureToken: true })
             .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
             );
+    }
+
+    logOut() {
+        this.user.next(null);
+        this.router.navigate(['/auth']);
     }
 
     private handleUserAuth(authResp: AuthPayloadResponse) {
