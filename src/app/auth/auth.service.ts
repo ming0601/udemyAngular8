@@ -1,7 +1,8 @@
+import { User } from './../shared/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Observable, throwError, Subject } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
 
 export interface AuthPayloadResponse {
     idToken: string;
@@ -19,6 +20,7 @@ const FIREBASE_API_KEY = 'AI';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
+    user = new Subject<User>();
 
     constructor(private http: HttpClient) {}
 
@@ -27,7 +29,8 @@ export class AuthService {
         .post<AuthPayloadResponse>(
             AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
             { email: email, password: password, returnSecureToken: true })
-        .pipe(this.handleError());
+        .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+        );
     }
 
     signIn(email: string, password: string): Observable<any> {
@@ -35,7 +38,14 @@ export class AuthService {
         .post<AuthPayloadResponse>(
             AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
             { email: email, password: password, returnSecureToken: true })
-        .pipe(this.handleError());
+        .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+        );
+    }
+
+    private handleUserAuth(authResp: AuthPayloadResponse) {
+            const expirationDate = new Date(new Date().getTime() + (+authResp.expiresIn * 1000));
+            const user = new User(authResp.email, authResp.localId, authResp.idToken, expirationDate);
+            this.user.next(user);
     }
 
     private handleError() {
