@@ -34,8 +34,7 @@ export class DataStorageService {
                     // all of its values are emitted. After that, it completes, regardless if the source completes.
             // exhaustMap works on 2 Observables, it works on the first (user) to get the token, then the HTTP
             exhaustMap(user => {
-                return this.http.get<Recipe[]>(FIREBASE_URL + RECIPE_DB,
-                    { params: new HttpParams().set('auth', user.token) });
+                return this.http.get<Recipe[]>(FIREBASE_URL + RECIPE_DB);
             }),
             map(recipes => {
                 return recipes.map(recipe => {
