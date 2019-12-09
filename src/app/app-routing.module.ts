@@ -1,3 +1,4 @@
+import { AuthGuard } from './auth/auth-guard.service';
 import { AuthComponent } from './auth/auth.component';
 import { RecipeResolverService } from './recipes/recipes-resolver.service';
 import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
@@ -10,7 +11,7 @@ import { NgModule } from '@angular/core';
 
 const appRoutes: Routes = [
     {path: '', redirectTo: '/recipes', pathMatch: 'full'},
-    {path: 'recipes', component: RecipesComponent, children: [
+    {path: 'recipes', canActivate: [AuthGuard], component: RecipesComponent, children: [
       {path: '', component: RecipeStartComponent},
       {path: 'new', component: RecipeEditComponent},
       {path: ':id', component: RecipeDetailComponent, resolve: [RecipeResolverService]},
