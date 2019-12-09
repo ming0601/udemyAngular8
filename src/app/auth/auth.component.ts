@@ -55,4 +55,7 @@ export class AuthComponent implements OnInit {
     authForm.reset();
   }
 
+  resetErrorMsg() {
+    this.errorMessage = null;
+  }
 }
