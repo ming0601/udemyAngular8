@@ -22,6 +22,7 @@ const FIREBASE_API_KEY = 'AI';
 @Injectable({providedIn: 'root'})
 export class AuthService {
     user = new BehaviorSubject<User>(null);
+    tokenExpirationTimer: any;
 
     constructor(private http: HttpClient, private router: Router) {}
 
@@ -56,18 +57,44 @@ export class AuthService {
         }
 
         const loadedUser = new User(userData.email, userData.id, userData.pToken, new Date(userData.pExpirationDate));
-        this.user.next(loadedUser);
+        if (loadedUser.token) {
+            this.user.next(loadedUser);
+            // userData.pExpirationDate contains the future date
+            const expirationTime = new Date(userData.pExpirationDate).getTime() - new Date().getTime();
+            this.autoLogOut(expirationTime);
+        }
     }
 
     logOut() {
         this.user.next(null);
         this.router.navigate(['/auth']);
+        // function used to remove user from localStorage on manual logout click
+        localStorage.removeItem('userData');
+
+        if (this.tokenExpirationTimer) {
+            // Cancels a Timeout object (tokenExpirationTimer) created by setTimeout().
+            clearTimeout(this.tokenExpirationTimer);
+        }
+        this.tokenExpirationTimer = null;
+    }
+
+    /**
+     * function to auto logout based on the expiration time
+     * the set time out is set to a var in order to modify it if
+     * the user manually logs out
+     * @param expirationTime : number
+     */
+    autoLogOut(expirationTime: number) {
+        this.tokenExpirationTimer = setTimeout(() => {
+            this.logOut();
+        }, expirationTime);
     }
 
     private handleUserAuth(authResp: AuthPayloadResponse) {
         const expirationDate = new Date(new Date().getTime() + (+authResp.expiresIn * 1000));
         const user = new User(authResp.email, authResp.localId, authResp.idToken, expirationDate);
         this.user.next(user);
+        this.autoLogOut(+authResp.expiresIn * 1000);
         localStorage.setItem('userData', JSON.stringify(user));
     }
 
