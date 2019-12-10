@@ -1,3 +1,4 @@
+import { CoreModule } from './core.module';
 import { SharedModule } from './shared/shared.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { RecipesModule } from './recipes/recipes.module';
@@ -31,12 +32,8 @@ import { PlaceholderDirective } from './shared/placeholder/placeholder.directive
     ReactiveFormsModule,
     RecipesModule,
     ShoppingListModule,
-    SharedModule
-  ],
-  providers: [
-    ShoppingListService,
-    RecipeService,
-    {provide: HTTP_INTERCEPTORS, useClass: UserInterceptorService, multi: true}
+    SharedModule,
+    CoreModule
   ],
   bootstrap: [AppComponent]
 })
