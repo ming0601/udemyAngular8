@@ -22,7 +22,6 @@ import { HeaderComponent } from './header/header.component';
     HttpClientModule,
     AppRoutingModule,
     ReactiveFormsModule,
-    RecipesModule,
     ShoppingListModule,
     SharedModule,
     CoreModule,
