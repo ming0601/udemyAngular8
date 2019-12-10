@@ -1,3 +1,4 @@
+import { SharedModule } from './shared/shared.module';
 import { ShoppingListModule } from './shopping-list/shopping-list.module';
 import { RecipesModule } from './recipes/recipes.module';
 import { UserInterceptorService } from './shared/user-interceptor.service';
@@ -20,10 +21,7 @@ import { PlaceholderDirective } from './shared/placeholder/placeholder.directive
   declarations: [
     AppComponent,
     HeaderComponent,
-    AuthComponent,
-    LoadingSpinnerComponent,
-    AlertComponent,
-    PlaceholderDirective
+    AuthComponent
   ],
   imports: [
     BrowserModule,
@@ -32,16 +30,14 @@ import { PlaceholderDirective } from './shared/placeholder/placeholder.directive
     AppRoutingModule,
     ReactiveFormsModule,
     RecipesModule,
-    ShoppingListModule
+    ShoppingListModule,
+    SharedModule
   ],
   providers: [
     ShoppingListService,
     RecipeService,
     {provide: HTTP_INTERCEPTORS, useClass: UserInterceptorService, multi: true}
   ],
-  bootstrap: [AppComponent],
-  entryComponents: [
-    AlertComponent
-  ]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }
