@@ -13,7 +13,7 @@ const initialListState = {
  * @param state: initial state of an object
  * @param action: Action
  */
-export function shoppingListReducer(state = initialListState, action: ShoppingListActions.AddIngredientAction) {
+export function shoppingListReducer(state = initialListState, action: ShoppingListActions.ShoppingListActions) {
     switch (action.type) {
         case ShoppingListActions.ADD_INGREDIENT: return {
             // copy all the properties in the state
@@ -22,9 +22,15 @@ export function shoppingListReducer(state = initialListState, action: ShoppingLi
             ...state,
             // changing now the ingredients
             // saving all old values of ingredients
-            // then adding the new Ingredients with action.payload
+            // then adding the new Ingredient with action.payload
             ingredients: [...state.ingredients, action.payload]
-        }
+        };
+        case ShoppingListActions.ADD_INGREDIENTS: return {
+            // changing now the ingredients
+            // saving all old values of ingredients
+            // then adding the new Ingredients with spread operator for action.payload array
+            ingredients: [...state.ingredients, ...action.payload]
+        };
         default: return state;
     }
 }
