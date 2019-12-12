@@ -1,9 +1,13 @@
 import { Router } from '@angular/router';
-import { User } from './../shared/user.model';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError, BehaviorSubject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
+import { Store } from '@ngrx/store';
+
+import { User } from './../shared/user.model';
+import * as AuthActions from './ngRxStore/auth.actions';
+import * as fromApp from '../ngRxStore/app.reducer';
 
 export interface AuthPayloadResponse {
     idToken: string;
@@ -24,7 +28,7 @@ export class AuthService {
     user = new BehaviorSubject<User>(null);
     tokenExpirationTimer: any;
 
-    constructor(private http: HttpClient, private router: Router) {}
+    constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) {}
 
     signup(email: string, password: string): Observable<any> {
         return this.http
@@ -58,7 +62,13 @@ export class AuthService {
 
         const loadedUser = new User(userData.email, userData.id, userData.pToken, new Date(userData.pExpirationDate));
         if (loadedUser.token) {
-            this.user.next(loadedUser);
+            // this.user.next(loadedUser);
+            this.store.dispatch(new AuthActions.LoginAction({
+                email: userData.email,
+                userId: userData.id,
+                token: userData.pToken,
+                expirationDate: new Date(userData.pExpirationDate)
+            }));
             // userData.pExpirationDate contains the future date
             const expirationTime = new Date(userData.pExpirationDate).getTime() - new Date().getTime();
             this.autoLogOut(expirationTime);
@@ -66,7 +76,8 @@ export class AuthService {
     }
 
     logOut() {
-        this.user.next(null);
+        // this.user.next(null);
+        this.store.dispatch(new AuthActions.LogoutAction());
         this.router.navigate(['/auth']);
         // function used to remove user from localStorage on manual logout click
         localStorage.removeItem('userData');
