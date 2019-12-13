@@ -3,10 +3,14 @@ import { User } from './../../shared/user.model';
 
 export interface AuthState {
     user: User;
+    authErrorMsg: string;
+    loading: boolean;
 }
 
 const initialAuthState: AuthState = {
-    user: null
+    user: null,
+    authErrorMsg: null,
+    loading: false
 };
 
 export function authReducer(
@@ -21,12 +25,28 @@ export function authReducer(
                 action.payload.expirationDate);
             return {
                 ...state,
-                user: newUser
+                user: newUser,
+                authErrorMsg: null,
+                loading: false
             };
         case AuthActions.LOGOUT:
             return {
                 ...state,
-                user: null
+                user: null,
+                authErrorMsg: null
+            };
+        case AuthActions.LOGIN_START:
+            return {
+                ...state,
+                authErrorMsg: null,
+                loading: true
+            };
+        case AuthActions.LOGIN_FAIL:
+            return {
+                ...state,
+                user: null,
+                authErrorMsg: action.payload,
+                loading: false
             };
         default: return state;
     }
