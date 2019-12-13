@@ -1,3 +1,4 @@
+import * as fromApp from './../ngRxStore/app.reducer';
 import { AuthService } from './../auth/auth.service';
 import { Recipe } from './../recipes/recipe.model';
 import { RecipeService } from './../recipes/recipe.service';
@@ -6,6 +7,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, tap, take, exhaustMap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { Store } from '@ngrx/store';
 
 
 const FIREBASE_URL = 'https://udemy-ng8-recipe-book.firebaseio.com/';
@@ -17,7 +19,8 @@ const RECIPE_DB = 'recipes.json';
 export class DataStorageService {
     constructor(private http: HttpClient,
                 private recipeService: RecipeService,
-                private authService: AuthService) {}
+                private authService: AuthService,
+                private store: Store<fromApp.AppState>) {}
 
     storeRecipes() {
         const recipes = this.recipeService.getRecipes();
@@ -27,11 +30,15 @@ export class DataStorageService {
     }
 
     fetchRecipes(): Observable<Recipe[]> {
-       return this.authService.user
+    //    return this.authService.user
+    return this.store.select('auth')
         .pipe(
             take(1), // `take` returns an Observable that emits only the first `count` values emitted
                     // by the source Observable. If the source emits fewer than `count` values then
                     // all of its values are emitted. After that, it completes, regardless if the source completes.
+            map(authState => {
+                return authState.user;
+            }),
             // exhaustMap works on 2 Observables, it works on the first (user) to get the token, then the HTTP
             exhaustMap(user => {
                 return this.http.get<Recipe[]>(FIREBASE_URL + RECIPE_DB);

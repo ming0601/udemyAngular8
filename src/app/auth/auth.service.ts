@@ -25,7 +25,7 @@ const FIREBASE_API_KEY = 'AI';
 
 @Injectable({providedIn: 'root'})
 export class AuthService {
-    user = new BehaviorSubject<User>(null);
+    // user = new BehaviorSubject<User>(null);
     tokenExpirationTimer: any;
 
     constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) {}
@@ -104,7 +104,12 @@ export class AuthService {
     private handleUserAuth(authResp: AuthPayloadResponse) {
         const expirationDate = new Date(new Date().getTime() + (+authResp.expiresIn * 1000));
         const user = new User(authResp.email, authResp.localId, authResp.idToken, expirationDate);
-        this.user.next(user);
+        // this.user.next(user);
+        this.store.dispatch(new AuthActions.LoginAction({
+            email: authResp.email,
+            userId: authResp.localId,
+            token: authResp.idToken,
+            expirationDate: expirationDate}));
         this.autoLogOut(+authResp.expiresIn * 1000);
         localStorage.setItem('userData', JSON.stringify(user));
     }
