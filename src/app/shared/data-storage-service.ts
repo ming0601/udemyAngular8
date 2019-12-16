@@ -1,3 +1,4 @@
+import * as RecipesActions from './../recipes/ngRxStore/recipes.actions';
 import * as fromApp from './../ngRxStore/app.reducer';
 import { AuthService } from './../auth/auth.service';
 import { Recipe } from './../recipes/recipe.model';
@@ -52,7 +53,8 @@ export class DataStorageService {
                 });
             }),
             tap(recipes => {
-                this.recipeService.setRecipes(recipes);
+                // this.recipeService.setRecipes(recipes);
+                this.store.dispatch(new RecipesActions.SetRecipesAction(recipes));
             })
         );
     }
