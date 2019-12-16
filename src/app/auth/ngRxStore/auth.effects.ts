@@ -20,6 +20,16 @@ const SIGNUP = 'signUp?key=';
 const SIGN_IN = 'signInWithPassword?key=';
 const FIREBASE_API_KEY = 'AI';
 
+/**
+ * NgRx Store provides us a single stream of actions where we can either dispatch or
+ * subscribe any action across our whole app. This action stream is an Observable.
+ * 
+ * NgRx Effects allow us to listen for particular action types, and “do something”
+ * when that action happens. Any effect you write is also an Observable.
+ * 
+ * An effect is an Observable which uses the Action Stream as its source, and also as its destination.
+ * That is, an effect subscribes to the Action Stream, and it can also publish to the action stream.
+ */
 @Injectable()
 export class AuthEffects {
     @Effect()
@@ -31,29 +41,61 @@ export class AuthEffects {
                     AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
                     { email: authData.payload.email, password: authData.payload.password, returnSecureToken: true }
                 ).pipe(
+                    // map auto wrap the returned data in a new Observable
                     map(respData => {
                         const expirationDate = new Date(new Date().getTime() + (+respData.expiresIn * 1000));
-                        return of(new AuthActions.LoginAction({
+                        return new AuthActions.LoginAction({
                             email: respData.email,
                             userId: respData.localId,
                             token: respData.idToken,
                             expirationDate: expirationDate})
-                            )
+                            
                     }),
-                    catchError(error => {
-                        // ...
-                        return of()
+                    catchError(errorResponse => {
+                        let errorMessage = 'An unknown error occurred!';
+                        if (!errorResponse.error || !errorResponse.error.error) {
+                            // we must create a new Observable with of()
+                            return of(new AuthActions.LoginFailAction(errorMessage));
+                        }
+                        switch (errorResponse.error.error.message) {
+                            case 'EMAIL_EXISTS':
+                                errorMessage = 'The email address is already in use by another account.';
+                                break;
+                            case 'OPERATION_NOT_ALLOWED':
+                                errorMessage = 'Password sign-in is disabled.';
+                                break;
+                            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+                                errorMessage = 'Too many requests. Please try again later.';
+                                break;
+                            case 'EMAIL_NOT_FOUND':
+                                errorMessage = 'Invalid email or password.';
+                                break;
+                            case 'INVALID_PASSWORD':
+                                errorMessage = 'Invalid email or password.';
+                                break;
+                            case 'USER_DISABLED':
+                                errorMessage = 'Invalid email or password.';
+                                break;
+                            default: break;
+                        }
+                        // we must create a new Observable with of()
+                        return of(new AuthActions.LoginFailAction(errorMessage));
                     })
                 );
         })
     );
 
-    @Effect()
+    // Common use cases for no-dispatch effects are when you want to just console.log() the action,
+    // or when you want to trigger router navigation.
+    @Effect({dispatch: false})
     authSuccess = this.actions$.pipe(
+         // Watch the stream for a LOGIN successful action
         ofType(AuthActions.LOGIN),
         tap(() => {
+            // Navigate to the the root
             this.router.navigate(['/']);
         })
+        // Do not dispatch any further actions
     );
 
     constructor(private actions$: Actions, private http: HttpClient, private router: Router) {}
