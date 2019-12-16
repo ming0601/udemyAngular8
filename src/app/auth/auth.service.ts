@@ -30,23 +30,23 @@ export class AuthService {
 
     constructor(private http: HttpClient, private router: Router, private store: Store<fromApp.AppState>) {}
 
-    signup(email: string, password: string): Observable<any> {
-        return this.http
-            .post<AuthPayloadResponse>(
-                AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
-                { email: email, password: password, returnSecureToken: true })
-            .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
-            );
-    }
+    // signup(email: string, password: string): Observable<any> {
+    //     return this.http
+    //         .post<AuthPayloadResponse>(
+    //             AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
+    //             { email: email, password: password, returnSecureToken: true })
+    //         .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+    //         );
+    // }
 
-    signIn(email: string, password: string): Observable<any> {
-        return this.http
-            .post<AuthPayloadResponse>(
-                AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
-                { email: email, password: password, returnSecureToken: true })
-            .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
-            );
-    }
+    // signIn(email: string, password: string): Observable<any> {
+    //     return this.http
+    //         .post<AuthPayloadResponse>(
+    //             AUTH_END_POINT + SIGN_IN + FIREBASE_API_KEY,
+    //             { email: email, password: password, returnSecureToken: true })
+    //         .pipe(this.handleError(), tap((authResp: AuthPayloadResponse) => this.handleUserAuth(authResp))
+    //         );
+    // }
 
     autoLogin() {
         const userData: {
@@ -78,7 +78,7 @@ export class AuthService {
     logOut() {
         // this.user.next(null);
         this.store.dispatch(new AuthActions.LogoutAction());
-        this.router.navigate(['/auth']);
+        // this.router.navigate(['/auth']);
         // function used to remove user from localStorage on manual logout click
         localStorage.removeItem('userData');
 

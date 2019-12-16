@@ -75,9 +75,9 @@ export class AuthEffects {
     // Common use cases for no-dispatch effects are when you want to just console.log() the action,
     // or when you want to trigger router navigation.
     @Effect({dispatch: false})
-    authSuccess = this.actions$.pipe(
+    authRedirect = this.actions$.pipe(
          // Watch the stream for a LOGIN successful action
-        ofType(AuthActions.AUTHENTICATE_SUCCESS),
+        ofType(AuthActions.AUTHENTICATE_SUCCESS, AuthActions.LOGOUT),
         tap(() => {
             // Navigate to the the root
             this.router.navigate(['/']);

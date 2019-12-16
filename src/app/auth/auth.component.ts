@@ -20,7 +20,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   isLoading = false;
   errorMessage = null;
   @ViewChild(PlaceholderDirective, {static: false}) alertHost: PlaceholderDirective;
-  closeAlertSub: Subscription;
+  private closeAlertSub: Subscription;
+  private storeSub: Subscription;
 
   constructor(private authService: AuthService,
               private router: Router,
@@ -28,7 +29,7 @@ export class AuthComponent implements OnInit, OnDestroy {
               private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    this.store.select('auth').subscribe(authState => {
+    this.storeSub = this.store.select('auth').subscribe(authState => {
       this.isLoading = false;
       this.errorMessage = authState.authErrorMsg;
       if (this.errorMessage) {
@@ -83,7 +84,8 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   resetErrorMsg() {
-    this.errorMessage = null;
+    // this.errorMessage = null;
+    this.store.dispatch(new AuthActions.ClearErrorAction());
   }
 
   showErrorAlert(message: string) {
@@ -103,6 +105,9 @@ export class AuthComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.closeAlertSub) {
       this.closeAlertSub.unsubscribe();
+    }
+    if (this.storeSub) {
+      this.storeSub.unsubscribe();
     }
   }
 }
