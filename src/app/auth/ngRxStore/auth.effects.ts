@@ -44,7 +44,7 @@ export class AuthEffects {
                     // map auto wrap the returned data in a new Observable
                     map(respData => {
                         const expirationDate = new Date(new Date().getTime() + (+respData.expiresIn * 1000));
-                        return new AuthActions.LoginAction({
+                        return new AuthActions.AuthenticateSuccessAction({
                             email: respData.email,
                             userId: respData.localId,
                             token: respData.idToken,
@@ -55,7 +55,7 @@ export class AuthEffects {
                         let errorMessage = 'An unknown error occurred!';
                         if (!errorResponse.error || !errorResponse.error.error) {
                             // we must create a new Observable with of()
-                            return of(new AuthActions.LoginFailAction(errorMessage));
+                            return of(new AuthActions.AuthenticateFailAction(errorMessage));
                         }
                         switch (errorResponse.error.error.message) {
                             case 'EMAIL_EXISTS':
@@ -79,7 +79,7 @@ export class AuthEffects {
                             default: break;
                         }
                         // we must create a new Observable with of()
-                        return of(new AuthActions.LoginFailAction(errorMessage));
+                        return of(new AuthActions.AuthenticateFailAction(errorMessage));
                     })
                 );
         })
@@ -90,7 +90,7 @@ export class AuthEffects {
     @Effect({dispatch: false})
     authSuccess = this.actions$.pipe(
          // Watch the stream for a LOGIN successful action
-        ofType(AuthActions.LOGIN),
+        ofType(AuthActions.AUTHENTICATE_SUCCESS),
         tap(() => {
             // Navigate to the the root
             this.router.navigate(['/']);
