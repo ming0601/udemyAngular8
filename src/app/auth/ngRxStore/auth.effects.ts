@@ -33,6 +33,26 @@ const FIREBASE_API_KEY = 'AI';
 @Injectable()
 export class AuthEffects {
     @Effect()
+    userSignup = this.actions$.pipe(
+        ofType(AuthActions.SIGNUP_START),
+        switchMap((authData: AuthActions.SignupStartAction) => {
+            return this.http
+                .post<AuthPayloadResponse>(
+                    AUTH_END_POINT + SIGNUP + FIREBASE_API_KEY,
+                    { email: authData.payload.email, password: authData.payload.password, returnSecureToken: true }
+                ).pipe(
+                    // map auto wrap the returned data in a new Observable
+                    map(respData => {
+                        return this.handleAuthentication(respData);       
+                    }),
+                    catchError(errorResponse => {
+                        return this.handleError(errorResponse);
+                    })
+                );
+        })
+    );
+
+    @Effect()
     authLogin = this.actions$.pipe(
         ofType(AuthActions.LOGIN_START),
         switchMap((authData: AuthActions.LoginStartAction) => {
@@ -43,43 +63,10 @@ export class AuthEffects {
                 ).pipe(
                     // map auto wrap the returned data in a new Observable
                     map(respData => {
-                        const expirationDate = new Date(new Date().getTime() + (+respData.expiresIn * 1000));
-                        return new AuthActions.AuthenticateSuccessAction({
-                            email: respData.email,
-                            userId: respData.localId,
-                            token: respData.idToken,
-                            expirationDate: expirationDate})
-                            
+                        return this.handleAuthentication(respData);       
                     }),
                     catchError(errorResponse => {
-                        let errorMessage = 'An unknown error occurred!';
-                        if (!errorResponse.error || !errorResponse.error.error) {
-                            // we must create a new Observable with of()
-                            return of(new AuthActions.AuthenticateFailAction(errorMessage));
-                        }
-                        switch (errorResponse.error.error.message) {
-                            case 'EMAIL_EXISTS':
-                                errorMessage = 'The email address is already in use by another account.';
-                                break;
-                            case 'OPERATION_NOT_ALLOWED':
-                                errorMessage = 'Password sign-in is disabled.';
-                                break;
-                            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
-                                errorMessage = 'Too many requests. Please try again later.';
-                                break;
-                            case 'EMAIL_NOT_FOUND':
-                                errorMessage = 'Invalid email or password.';
-                                break;
-                            case 'INVALID_PASSWORD':
-                                errorMessage = 'Invalid email or password.';
-                                break;
-                            case 'USER_DISABLED':
-                                errorMessage = 'Invalid email or password.';
-                                break;
-                            default: break;
-                        }
-                        // we must create a new Observable with of()
-                        return of(new AuthActions.AuthenticateFailAction(errorMessage));
+                        return this.handleError(errorResponse);
                     })
                 );
         })
@@ -99,4 +86,45 @@ export class AuthEffects {
     );
 
     constructor(private actions$: Actions, private http: HttpClient, private router: Router) {}
+
+    handleAuthentication(respData: AuthPayloadResponse) {
+        const expirationDate = new Date(new Date().getTime() + (+respData.expiresIn * 1000));
+        return new AuthActions.AuthenticateSuccessAction({
+            email: respData.email,
+            userId: respData.localId,
+            token: respData.idToken,
+            expirationDate: expirationDate
+        });
+    }
+    
+    handleError(errorResponse: any) {
+        let errorMessage = 'An unknown error occurred!';
+        if (!errorResponse.error || !errorResponse.error.error) {
+            // we must create a new Observable with of()
+            return of(new AuthActions.AuthenticateFailAction(errorMessage));
+        }
+        switch (errorResponse.error.error.message) {
+            case 'EMAIL_EXISTS':
+                errorMessage = 'The email address is already in use by another account.';
+                break;
+            case 'OPERATION_NOT_ALLOWED':
+                errorMessage = 'Password sign-in is disabled.';
+                break;
+            case 'TOO_MANY_ATTEMPTS_TRY_LATER':
+                errorMessage = 'Too many requests. Please try again later.';
+                break;
+            case 'EMAIL_NOT_FOUND':
+                errorMessage = 'Invalid email or password.';
+                break;
+            case 'INVALID_PASSWORD':
+                errorMessage = 'Invalid email or password.';
+                break;
+            case 'USER_DISABLED':
+                errorMessage = 'Invalid email or password.';
+                break;
+            default: break;
+        }
+        // we must create a new Observable with of()
+        return of(new AuthActions.AuthenticateFailAction(errorMessage));
+    }
 }

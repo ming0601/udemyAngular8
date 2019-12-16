@@ -47,7 +47,7 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    let authObservable: Observable<AuthPayloadResponse>;
+    // let authObservable: Observable<AuthPayloadResponse>;
 
     const email = authForm.value.email;
     const password = authForm.value.password;
@@ -58,7 +58,11 @@ export class AuthComponent implements OnInit, OnDestroy {
         password: password
       }));
     } else {
-      authObservable = this.authService.signup(email, password);
+      // authObservable = this.authService.signup(email, password);
+      this.store.dispatch(new AuthActions.SignupStartAction({
+        email: email,
+        password: password
+      }));
     }
 
     // authObservable.subscribe(
