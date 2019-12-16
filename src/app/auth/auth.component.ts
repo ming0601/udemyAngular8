@@ -2,7 +2,7 @@ import * as AuthActions from './ngRxStore/auth.actions';
 import * as fromApp from './../ngRxStore/app.reducer';
 import { PlaceholderDirective } from './../shared/placeholder/placeholder.directive';
 import { AlertComponent } from './../shared/alert/alert.component';
-import { AuthService, AuthPayloadResponse } from './auth.service';
+import { AuthService } from './auth.service';
 
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';

@@ -9,14 +9,14 @@ import { User } from './../shared/user.model';
 import * as AuthActions from './ngRxStore/auth.actions';
 import * as fromApp from '../ngRxStore/app.reducer';
 
-export interface AuthPayloadResponse {
-    idToken: string;
-    email: string;
-    refreshToken: string;
-    expiresIn: string;
-    localId: string;
-    registered?: boolean;
-}
+// export interface AuthPayloadResponse {
+//     idToken: string;
+//     email: string;
+//     refreshToken: string;
+//     expiresIn: string;
+//     localId: string;
+//     registered?: boolean;
+// }
 
 // const AUTH_END_POINT = 'https://identitytoolkit.googleapis.com/v1/accounts:';
 // const SIGNUP = 'signUp?key=';
