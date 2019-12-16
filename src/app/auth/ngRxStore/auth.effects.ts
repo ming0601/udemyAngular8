@@ -1,3 +1,4 @@
+import { User } from './../../shared/user.model';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import * as AuthActions from './auth.actions';
@@ -72,6 +73,47 @@ export class AuthEffects {
         })
     );
 
+    @Effect()
+    autoLogin = this.actions$.pipe(
+        ofType(AuthActions.AUTO_LOGIN),
+        map(() => {
+            const userData: {
+                email: string;
+                id: string;
+                pToken: string;
+                pExpirationDate: string;
+            } = JSON.parse(localStorage.getItem('userData'));
+    
+            if (!userData) {
+                return {type: 'DUMMY'};;
+            }
+    
+            const loadedUser = new User(userData.email, userData.id, userData.pToken, new Date(userData.pExpirationDate));
+            if (loadedUser.token) {
+                // this.user.next(loadedUser);
+                return new AuthActions.AuthenticateSuccessAction({
+                    email: userData.email,
+                    userId: userData.id,
+                    token: userData.pToken,
+                    expirationDate: new Date(userData.pExpirationDate)
+                });
+                // userData.pExpirationDate contains the future date
+                // const expirationTime = new Date(userData.pExpirationDate).getTime() - new Date().getTime();
+                // this.autoLogOut(expirationTime);
+            }
+            return {type: 'DUMMY'};
+        })
+    );
+
+    @Effect({dispatch: false})
+    authLogout = this.actions$.pipe(
+        ofType(AuthActions.LOGOUT),
+        tap(() => {
+            localStorage.removeItem('userData');
+        })
+
+    );
+
     // Common use cases for no-dispatch effects are when you want to just console.log() the action,
     // or when you want to trigger router navigation.
     @Effect({dispatch: false})
@@ -89,6 +131,9 @@ export class AuthEffects {
 
     handleAuthentication(respData: AuthPayloadResponse) {
         const expirationDate = new Date(new Date().getTime() + (+respData.expiresIn * 1000));
+        const user = new User(respData.email, respData.localId, respData.idToken, expirationDate);
+        localStorage.setItem('userData', JSON.stringify(user));
+
         return new AuthActions.AuthenticateSuccessAction({
             email: respData.email,
             userId: respData.localId,
