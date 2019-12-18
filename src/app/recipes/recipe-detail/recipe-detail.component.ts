@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import * as fromApp from './../../ngRxStore/app.reducer';
+import * as RecipesActions from './../ngRxStore/recipes.actions';
 import { RecipeService } from './../recipe.service';
 import { Recipe } from './../recipe.model';
 
@@ -53,7 +54,8 @@ export class RecipeDetailComponent implements OnInit {
   }
 
   deleteRecipe() {
-    this.recipeService.deleteRecipe(this.id);
+    // this.recipeService.deleteRecipe(this.id);
+    this.store.dispatch(new RecipesActions.DeleteRecipeAction(this.id));
     this.router.navigate(['/recipes']);
   }
 }
