@@ -1,3 +1,4 @@
+import { RecipesEffects } from './recipes/ngRxStore/recipes.effects';
 import { AuthEffects } from './auth/ngRxStore/auth.effects';
 import { CoreModule } from './core.module';
 import { BrowserModule } from '@angular/platform-browser';
@@ -27,7 +28,7 @@ import { environment } from 'src/environments/environment';
     AppRoutingModule,
     ReactiveFormsModule,
     StoreModule.forRoot(fromApp.appReducer),
-    EffectsModule.forRoot([AuthEffects]),
+    EffectsModule.forRoot([AuthEffects, RecipesEffects]),
     StoreDevtoolsModule.instrument({ logOnly: environment.production }),
     StoreRouterConnectingModule.forRoot(),
     SharedModule,

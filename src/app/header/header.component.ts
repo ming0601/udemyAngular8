@@ -1,3 +1,4 @@
+import * as RecipesActions from './../recipes/ngRxStore/recipes.actions';
 import * as AuthActions from './../auth/ngRxStore/auth.actions';
 import * as fromApp from './../ngRxStore/app.reducer';
 import { AuthService } from './../auth/auth.service';
@@ -35,7 +36,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   fetchRecipes() {
-    this.dataStorageService.fetchRecipes().subscribe();
+    // this.dataStorageService.fetchRecipes().subscribe();
+    this.store.dispatch(new RecipesActions.FetchRecipesAction());
   }
 
   logOut() {

@@ -106,7 +106,8 @@ export class AuthEffects {
                     email: userData.email,
                     userId: userData.id,
                     token: userData.pToken,
-                    expirationDate: new Date(userData.pExpirationDate)
+                    expirationDate: new Date(userData.pExpirationDate),
+                    redirect: false
                 });
                 // userData.pExpirationDate contains the future date
                 // const expirationTime = new Date(userData.pExpirationDate).getTime() - new Date().getTime();
@@ -134,9 +135,11 @@ export class AuthEffects {
     authRedirect = this.actions$.pipe(
          // Watch the stream for a LOGIN successful action
         ofType(AuthActions.AUTHENTICATE_SUCCESS),
-        tap(() => {
-            // Navigate to the the root
-            this.router.navigate(['/']);
+        tap((authSuccessAction: AuthActions.AuthenticateSuccessAction) => {
+            // Navigate to the the root if redirect is asked
+            if (authSuccessAction.payload.redirect) {
+                this.router.navigate(['/']);                
+            }
         })
         // Do not dispatch any further actions
     );
@@ -152,7 +155,8 @@ export class AuthEffects {
             email: respData.email,
             userId: respData.localId,
             token: respData.idToken,
-            expirationDate: expirationDate
+            expirationDate: expirationDate,
+            redirect: true
         });
     }
     
