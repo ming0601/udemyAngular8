@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { Observable, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { NgForm } from '@angular/forms';
 import { Component, OnInit, ComponentFactoryResolver, ViewChild, OnDestroy } from '@angular/core';
 
@@ -48,37 +48,20 @@ export class AuthComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    // let authObservable: Observable<AuthPayloadResponse>;
 
     const email = authForm.value.email;
     const password = authForm.value.password;
     if (this.isLoginMode) {
-      // authObservable = this.authService.signIn(email, password);
       this.store.dispatch(new AuthActions.LoginStartAction({
         email: email,
         password: password
       }));
     } else {
-      // authObservable = this.authService.signup(email, password);
       this.store.dispatch(new AuthActions.SignupStartAction({
         email: email,
         password: password
       }));
     }
-
-    // authObservable.subscribe(
-    //   responseData => {
-    //     console.log(responseData);
-    //     this.isLoading = false;
-    //     this.router.navigate(['/recipes']);
-    //   },
-    //   error => {
-    //     console.log(error);
-    //     this.errorMessage = error;
-    //     this.showErrorAlert(error);
-    //     this.isLoading = false;
-    //   }
-    // );
 
     authForm.reset();
   }

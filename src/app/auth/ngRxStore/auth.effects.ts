@@ -109,9 +109,6 @@ export class AuthEffects {
                     expirationDate: new Date(userData.pExpirationDate),
                     redirect: false
                 });
-                // userData.pExpirationDate contains the future date
-                // const expirationTime = new Date(userData.pExpirationDate).getTime() - new Date().getTime();
-                // this.autoLogOut(expirationTime);
             }
             return {type: 'DUMMY'};
         })

@@ -7,7 +7,6 @@ import { FormGroup, FormControl, FormArray, AbstractControl, Validators } from '
 
 import * as RecipesActions from './../ngRxStore/recipes.actions';
 import * as fromApp from './../../ngRxStore/app.reducer';
-import { RecipeService } from './../recipe.service';
 
 @Component({
   selector: 'app-recipe-edit',
@@ -21,7 +20,6 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
   storeSub: Subscription;
 
   constructor(private route: ActivatedRoute,
-              private recipeService: RecipeService,
               private router: Router,
               private store: Store<fromApp.AppState>) { }
 
@@ -45,7 +43,6 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
     const recipeIngredients = new FormArray([]);
 
     if (this.editMode) {
-      // const recipe = this.recipeService.getRecipeByIndex(this.id);
       this.storeSub = this.store.select('recipes')
         .pipe(
           map(recipesState => recipesState.recipes.find(
@@ -82,10 +79,8 @@ export class RecipeEditComponent implements OnInit, OnDestroy {
 
   onSubmit() {
     if (this.editMode) {
-      // this.recipeService.updateRecipe(this.id, this.recipeForm.value);
       this.store.dispatch(new RecipesActions.UpdateRecipeAction({index: this.id, updatedRecipe: this.recipeForm.value}));
     } else {
-      // this.recipeService.addRecipe(this.recipeForm.value);
       this.store.dispatch(new RecipesActions.AddRecipeAction( this.recipeForm.value));
     }
     this.cancelEditRecipe();

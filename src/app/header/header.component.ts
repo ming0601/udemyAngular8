@@ -3,10 +3,9 @@ import * as AuthActions from './../auth/ngRxStore/auth.actions';
 import * as fromApp from './../ngRxStore/app.reducer';
 import { AuthService } from './../auth/auth.service';
 import { Subscription } from 'rxjs';
-// import { DataStorageService } from './../shared/data-storage-service';
-import { Component, OnInit, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { take, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-header',
@@ -17,14 +16,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isAuthenticated = false;
   userSub: Subscription;
   constructor(
-    // private dataStorageService: DataStorageService,
     private userAuthService: AuthService,
     private store: Store<fromApp.AppState>) { }
 
   ngOnInit() {
-    // this.userSub = this.userAuthService.user.subscribe(user => {
-    //   this.isAuthenticated = !!user;
-    // });
     // In this pipe we don't take 1 because we have to listen all changes
     // in order to update HTML li accordingly
     this.userSub = this.store.select('auth').pipe(
@@ -35,17 +30,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   saveRecipes() {
-    // this.dataStorageService.storeRecipes();
     this.store.dispatch(new RecipesActions.StoreRecipesAction());
   }
 
   fetchRecipes() {
-    // this.dataStorageService.fetchRecipes().subscribe();
     this.store.dispatch(new RecipesActions.FetchRecipesAction());
   }
 
   logOut() {
-    // this.userAuthService.logOut();
     this.store.dispatch(new AuthActions.LogoutAction());
   }
 
