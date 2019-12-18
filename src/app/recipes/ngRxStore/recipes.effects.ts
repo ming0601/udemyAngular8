@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { HttpClient } from '@angular/common/http';
-import { switchMap, take, map, exhaustMap } from 'rxjs/operators';
+import { switchMap, take, map, exhaustMap, withLatestFrom } from 'rxjs/operators';
 
 import { Recipe } from './../recipe.model';
 import * as RecipesActions from './recipes.actions';
@@ -42,5 +42,18 @@ export class RecipesEffects {
             });
         }),
         map(recipes => new RecipesActions.SetRecipesAction(recipes))
-    )
+    );
+
+    @Effect({dispatch: false})
+    storeRecipes = this.actions$.pipe(
+        ofType(RecipesActions.STORE_RECIPES),
+        // withLatestFrom also provides the last value from another observable in this main one
+        withLatestFrom(this.store.select('recipes')),
+        // in switchMap we have two data : actionData from ofType and recipesState from withLatestFrom
+        // we regroup these two data using Array destructuring
+        switchMap(([actionData, recipesState]) => {
+            return this.http
+            .put(FIREBASE_URL + RECIPE_DB, recipesState.recipes);
+        })
+    );
 }
