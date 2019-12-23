@@ -1,12 +1,22 @@
+import { HttpClientModule } from '@angular/common/http';
+import { AuthService } from './auth/auth.service';
 import { TestBed, async } from '@angular/core/testing';
 import { AppComponent } from './app.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Component } from '@angular/core';
 
 describe('AppComponent', () => {
+  const authServiceSpy: AuthService = jasmine.createSpyObj('AuthService', ['autoLogin']);
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [RouterTestingModule, HttpClientModule],
       declarations: [
-        AppComponent
+        AppComponent,
+        DummyHeaderComponent
       ],
+      providers: [
+        { provide: AuthService, useValue: authServiceSpy }
+      ]
     }).compileComponents();
   }));
 
@@ -16,16 +26,19 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'angular-8-complete'`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.debugElement.componentInstance;
-    expect(app.title).toEqual('angular-8-complete');
-  });
-
-  it('should render title', () => {
+  it('should use the AuthService', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.content span').textContent).toContain('angular-8-complete app is running!');
+    expect(authServiceSpy.autoLogin).toBeTruthy();
+    expect(authServiceSpy.autoLogin).toHaveBeenCalled();
+    expect(authServiceSpy.autoLogin).toHaveBeenCalledTimes(1);
   });
 });
+
+
+@Component({
+  selector: 'app-header',
+  template: '<p id="mock-app-header"></p>',
+})
+export class DummyHeaderComponent {
+}
