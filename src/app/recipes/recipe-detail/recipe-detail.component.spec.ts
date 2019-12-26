@@ -9,18 +9,9 @@ import { Injectable } from '@angular/core';
 import { Recipe } from '../recipe.model';
 import { ShoppingListService } from 'src/app/shopping-list/shopping-list.service';
 
-fdescribe('RecipeDetailComponent', () => {
+describe('RecipeDetailComponent', () => {
   let component: RecipeDetailComponent;
   let fixture: ComponentFixture<RecipeDetailComponent>;
-  const recipeServiceSpy: RecipeService =
-    jasmine.createSpyObj('RecipeService', ['getRecipeByIndex', 'addIngredientsToShoppingList', 'deleteRecipe']);
-//   const fakeActivatedRoute = {
-//     route: {
-//       params: {
-//             id: 1
-//         }
-//     }
-// };
   let addIngredientSpy: any;
   let deleteIngredientSpy: any;
   let getRecipeSpy: any;
@@ -58,27 +49,43 @@ fdescribe('RecipeDetailComponent', () => {
     fixture.detectChanges();
   });
 
-  fit('should initialize the recipeDetail in ngOnInit', () => {
-    component.ngOnInit();
-    console.log(component.id);
-    expect(component.id).toEqual(1);
-    expect(getRecipeSpy).toHaveBeenCalled();
-    // expect(getRecipeSpy).toHaveBeenCalledTimes(1); // 2 times
-    expect(getRecipeSpy).toHaveBeenCalledWith(1);
-  });
-
-  fit('should create', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  fit('should call addIngredientsToShoppingList', () => {
+  it('should initialize the recipeDetail when creating the component', () => {
+    console.log(component.id);
+    expect(component.id).toEqual(1);
+    expect(getRecipeSpy).toHaveBeenCalled();
+    expect(getRecipeSpy).toHaveBeenCalledTimes(1);
+    expect(getRecipeSpy).toHaveBeenCalledWith(1);
+  });
+
+  it('should create the HTML with all the values', () => {
+    // testing DOM display elements
+    // recipe detail display
+    const dom = fixture.debugElement.nativeElement;
+    expect(dom.querySelector('img').src).toContain('test-imagePath');
+    expect(dom.querySelector('img').alt).toEqual('test-name');
+    expect(dom.querySelector('h1').textContent).toEqual('test-name');
+    expect(dom.querySelector('div:nth-child(4)').textContent).toContain('test-description');
+    expect(dom.querySelector('li.list-group-item').textContent).toContain('test-ingredient - 1');
+
+    // dropdown
+    expect(dom.querySelector('button').textContent).toContain('Manage Recipe');
+    expect(dom.querySelector('ul.dropdown-menu li:first-child').textContent).toContain('To Shopping List');
+    expect(dom.querySelector('ul.dropdown-menu li:nth-child(2)').textContent).toContain('Edit Recipe');
+    expect(dom.querySelector('ul.dropdown-menu li:last-child').textContent).toContain('Delete Recipe');
+  });
+
+  it('should call addIngredientsToShoppingList', () => {
     component.sendIngredientToShoppingList();
     expect(addIngredientSpy).toHaveBeenCalled();
     expect(addIngredientSpy).toHaveBeenCalledTimes(1);
     expect(addIngredientSpy).toHaveBeenCalledWith([new Ingredient('test-ingredient', 1)]);
   });
 
-  fit('should call deleteRecipe and navigate to /recipes', () => {
+  it('should call deleteRecipe and navigate to /recipes', () => {
     component.id = 21;
     component.deleteRecipe();
     expect(deleteIngredientSpy).toHaveBeenCalled();
@@ -91,7 +98,7 @@ fdescribe('RecipeDetailComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/recipes']);
   });
 
-  fit('should call onEditRecipe and navigate to edit', () => {
+  it('should call onEditRecipe and navigate to edit', () => {
     component.onEditRecipe();
     // testing redirection
     expect(router.navigate).toHaveBeenCalled();
@@ -101,7 +108,7 @@ fdescribe('RecipeDetailComponent', () => {
 
 });
 
-class MockRecipeService extends RecipeService {
+export class MockRecipeService extends RecipeService {
 
   getRecipeByIndex(index: number): Recipe {
     return new Recipe('test-name', 'test-description', 'test-imagePath', [new Ingredient('test-ingredient', 1)]);
@@ -110,4 +117,8 @@ class MockRecipeService extends RecipeService {
   addIngredientsToShoppingList(ingredients: Ingredient[]) {}
 
   deleteRecipe(index: number) {}
+
+  updateRecipe(index: number, recipe: Recipe) {}
+
+  addRecipe(recipe: Recipe) {}
 }
