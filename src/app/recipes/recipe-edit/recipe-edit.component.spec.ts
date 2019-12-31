@@ -1,4 +1,4 @@
-import { ReactiveFormsModule, FormArray, FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, FormArray, FormGroup, AbstractControl } from '@angular/forms';
 import { RecipeService } from './../recipe.service';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -8,7 +8,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { ShoppingListService } from 'src/app/shopping-list/shopping-list.service';
 
-fdescribe('RecipeEditComponent', () => {
+describe('RecipeEditComponent', () => {
   let component: RecipeEditComponent;
   let fixture: ComponentFixture<RecipeEditComponent>;
   let updateRecipeSpy: any;
@@ -49,11 +49,11 @@ fdescribe('RecipeEditComponent', () => {
     fixture.detectChanges();
   });
 
-  fit('should create', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  fit('should initialize id in ngOnInit', () => {
+  it('should initialize id in ngOnInit', () => {
     expect(component.id).toEqual(1);
     expect(component.editMode).toEqual(true);
 
@@ -63,11 +63,11 @@ fdescribe('RecipeEditComponent', () => {
     expect(getRecipeSpy).toHaveBeenCalledWith(1);
   });
 
-  fit('should validate the form when data is filled', () => {
+  it('should validate the form when data is filled', () => {
     expect(component.recipeForm.valid).toBeTruthy();
   });
 
-  fit('should fill all the fields with the retrieved data', () => {
+  it('should fill all the fields with the retrieved data', () => {
     const recipeName = component.recipeForm.controls.name;
     expect(recipeName.value).toEqual('test-name');
 
@@ -88,7 +88,7 @@ fdescribe('RecipeEditComponent', () => {
     expect(component.recipeForm.valid).toBeTruthy();
   });
 
-  fit('should invalidate with the Validators when a required field is empty or filled with wrong data type', () => {
+  it('should invalidate with the Validators when a required field is empty or filled with wrong data type', () => {
     const recipeName = component.recipeForm.controls.name;
     recipeName.setValue('');
     expect(recipeName.hasError('required')).toBeTruthy();
@@ -113,7 +113,7 @@ fdescribe('RecipeEditComponent', () => {
     expect(component.recipeForm.valid).toBeFalsy();
   });
 
-  fit('should call updateRecipe when editMode is true', () => {
+  it('should call updateRecipe when onSubmit is called and editMode is true', () => {
     component.onSubmit();
     expect(updateRecipeSpy).toHaveBeenCalled();
     expect(updateRecipeSpy).toHaveBeenCalledTimes(1);
@@ -128,7 +128,7 @@ fdescribe('RecipeEditComponent', () => {
     // expect(router.navigate).toHaveBeenCalledWith(['../'], {relativeTo: { params: of({ id: 1 }) }}); // same data but fails...
   });
 
-  fit('should call addRecipe when editMode is false', () => {
+  it('should call addRecipe when onSubmit is called and editMode is false', () => {
     component.editMode = false;
     component.onSubmit();
     expect(addRecipeSpy).toHaveBeenCalled();
@@ -141,5 +141,64 @@ fdescribe('RecipeEditComponent', () => {
     expect(router.navigate).toHaveBeenCalled();
     expect(router.navigate).toHaveBeenCalledTimes(1);
     // expect(router.navigate).toHaveBeenCalledWith(['../'], {relativeTo: { params: of({ id: 1 }) }}); // same data but fails...
+  });
+
+  it('should reset all the fields when onSubmit is called', () => {
+    component.onSubmit();
+    const recipeName = component.recipeForm.controls.name;
+    expect(recipeName.value).toBeNull();
+
+    const recipeImgPath = component.recipeForm.controls.imagePath;
+    expect(recipeImgPath.value).toBeNull();
+
+    const recipeDesc = component.recipeForm.controls.description;
+    expect(recipeDesc.value).toBeNull();
+
+    const ingredient = component.recipeForm.get('ingredients') as FormArray;
+    const firstIngName = (ingredient.at(0) as FormGroup).controls.name;
+    expect(firstIngName.value).toBeNull();
+
+    const firstIngAmount = (ingredient.at(0) as FormGroup).controls.amount;
+    expect(firstIngAmount.value).toBeNull();
+
+    expect(component.recipeForm.valid).toBeFalsy();
+  });
+
+  it('should return all the controls of ingredientsFormArray when calling getIngredientsControls', () => {
+    const controls: AbstractControl[] = component.getIngredientsControls();
+    expect(controls.length).toEqual(1);
+    expect(controls[0].value.name).toEqual('test-ingredient');
+    expect(controls[0].value.amount).toEqual(1);
+  });
+
+  it('should add new ingredient when addIngredient is called', () => {
+    component.addIngredient();
+    const controls: AbstractControl[] = component.getIngredientsControls();
+    expect(controls.length).toEqual(2);
+    expect(controls[0].value.name).toEqual('test-ingredient');
+    expect(controls[0].value.amount).toEqual(1);
+
+    // new controls are set with null values
+    expect(controls[1].value.name).toBeNull();
+    expect(controls[1].value.amount).toBeNull();
+
+    // if we set new values, Ingredient should be updated
+    const ingredient = component.recipeForm.get('ingredients') as FormArray;
+    const secondIngName = (ingredient.at(1) as FormGroup).controls.name;
+    const secondIngAmount = (ingredient.at(1) as FormGroup).controls.amount;
+    secondIngName.setValue('new-ingredient');
+    secondIngAmount.setValue(5);
+    expect(controls[1].value.name).toEqual('new-ingredient');
+    expect(controls[1].value.amount).toEqual(5);
+  });
+
+  it('should delete an ingredient when deleteIngredient is called', () => {
+    // check first that we have an ingredient
+    const ingredientsInitFormArray = component.recipeForm.get('ingredients') as FormArray;
+    expect(ingredientsInitFormArray.length).toEqual(1);
+    // check that the ingredient is actually deleted
+    component.deleteIngredient(0);
+    const ingredientsFormArray = component.recipeForm.get('ingredients') as FormArray;
+    expect(ingredientsFormArray.length).toEqual(0);
   });
 });
