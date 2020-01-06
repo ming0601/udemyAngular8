@@ -1,5 +1,5 @@
 import { Ingredient } from './../../shared/ingredient.model';
-import { of, BehaviorSubject, Observable } from 'rxjs';
+import { of, BehaviorSubject, Observable, Subject } from 'rxjs';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { RecipeDetailComponent } from './recipe-detail.component';
@@ -109,6 +109,7 @@ describe('RecipeDetailComponent', () => {
 });
 
 export class MockRecipeService extends RecipeService {
+  recipeChanged = new Subject<Recipe[]>();
 
   getRecipeByIndex(index: number): Recipe {
     return new Recipe('test-name', 'test-description', 'test-imagePath', [new Ingredient('test-ingredient', 1)]);
@@ -121,4 +122,8 @@ export class MockRecipeService extends RecipeService {
   updateRecipe(index: number, recipe: Recipe) {}
 
   addRecipe(recipe: Recipe) {}
+
+  getRecipes(): Recipe[] {
+    return [];
+  }
 }
