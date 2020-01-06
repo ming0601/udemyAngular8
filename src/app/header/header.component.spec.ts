@@ -85,8 +85,8 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
 
     const dom = fixture.debugElement.nativeElement;
-    expect(dom.querySelector('ul.navbar-nav li:first-child a').innerText).toContain('Recipes');
     expect(dom.querySelector('ul.navbar-nav li:first-child a').innerText).not.toContain('Authenticate');
+    expect(dom.querySelector('ul.navbar-nav li:first-child a').innerText).toContain('Recipes');
     expect(dom.querySelector('ul.navbar-nav li:last-child a').innerText).toContain('Shopping list');
 
     expect(dom.querySelector('ul.ml-auto li:first-child a').innerText).toContain('Log Out');
@@ -125,6 +125,10 @@ export class MockAuthService extends AuthService {
   user = new BehaviorSubject<User>(null);
 
   signup(email: string, password: string): Observable<any> {
+    return of(new User('testUser.email', 'testUser.localId', 'testUser.idToken', new Date()));
+  }
+
+  signIn(email: string, password: string): Observable<any> {
     return of(new User('testUser.email', 'testUser.localId', 'testUser.idToken', new Date()));
   }
 
