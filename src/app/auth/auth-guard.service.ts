@@ -1,3 +1,4 @@
+import { User } from './../shared/user.model';
 import { take, map } from 'rxjs/operators';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
@@ -8,11 +9,11 @@ import { ActivatedRouteSnapshot, CanActivate, RouterStateSnapshot, Router, UrlTr
 export class AuthGuard implements CanActivate {
     constructor(private authService: AuthService, private router: Router) { }
 
-    canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot)
-                        : boolean | UrlTree | Promise<boolean | UrlTree> | Observable<boolean | UrlTree> {
+    canActivate(): boolean | UrlTree | Promise<boolean | UrlTree> | Observable<boolean | UrlTree> {
+
         return this.authService.user.pipe(
             take(1),
-            map(user => {
+            map((user: User) => {
                 const hasUser = !!user;
                 if (hasUser) {
                     return true;
