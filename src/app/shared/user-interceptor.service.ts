@@ -1,4 +1,3 @@
-import { Params } from '@angular/router';
 import { User } from './user.model';
 import { take, exhaustMap } from 'rxjs/operators';
 import { AuthService } from './../auth/auth.service';
