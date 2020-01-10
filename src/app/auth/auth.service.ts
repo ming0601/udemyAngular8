@@ -115,14 +115,14 @@ export class AuthService {
                     errorMessage = 'Too many requests. Please try again later.';
                     break;
                 case 'EMAIL_NOT_FOUND':
-                        errorMessage = 'Invalid email or password.';
-                        break;
+                    errorMessage = 'Invalid email or password.';
+                    break;
                 case 'INVALID_PASSWORD':
-                        errorMessage = 'Invalid email or password.';
-                        break;
+                    errorMessage = 'Invalid email or password.';
+                    break;
                 case 'USER_DISABLED':
-                        errorMessage = 'Invalid email or password.';
-                        break;
+                    errorMessage = 'Invalid email or password.';
+                    break;
                 default: break;
             }
             return throwError(errorMessage);
